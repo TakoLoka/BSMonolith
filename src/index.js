@@ -6,6 +6,7 @@ const { check, validationResult } = require("express-validator");
 const session = require("express-session");
 
 const app = express();
+const pageSize = 12;
 
 function isAdmin(req, res, next) {
   if (req.session.user && req.session.user.isAdmin) {
@@ -34,11 +35,21 @@ app.set("views", "src/views");
 app.set("view engine", "ejs");
 
 app.get("/", (req, res, next) => {
-  db.all("SELECT * FROM books", (err, books) => {
+  db.get("SELECT COUNT(*) as COUNT FROM books", (err, row) => {
     if (err) {
       return next(err);
     }
-    res.render("books/index", { books });
+    const maxPage = Math.ceil(row.COUNT/pageSize);
+
+    if(!req.query.page)
+      req.query.page = 1;
+
+    db.all(`SELECT * FROM books LIMIT ${pageSize} OFFSET ${pageSize * (req.query.page - 1)}`, (err, books) => {
+      if(err){
+        return next(err);
+      }
+      res.render("books/index", { books, maxPage });
+    });
   });
 });
 
@@ -196,6 +207,7 @@ app.post(
 );
 
 app.use((err, req, res, next) => {
+  console.log(err);
   res.render("error/500");
 });
 
