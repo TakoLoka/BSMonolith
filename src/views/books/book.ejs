@@ -1,0 +1,41 @@
+<div class="row mt-5 align-items-center">
+  <div class="col-md-4">
+    <img src="<%= book.imageUrl %>" />
+  </div>
+  <div class="col-md-4 align-center">
+    <h3><%= book.name %></h3>
+  </div>
+  <div class="col-md-4 align-center">
+    <p>Price: <%= book.price %></p>
+    <p>Author: <%= book.author %></p>
+    <p>Available Since: <%= book.createdAt %></p>
+  </div>
+  <% if (typeof user === 'object' && user && user.isAdmin) { %>
+    <div class="col-md-12">
+      <h1 class="text-center">Edit Book</h1>
+    </div>
+    <div class="col-md-12">
+      <form method="post" action="/book/<%= book.id %>">
+        <div class="mb-3">
+          <label for="name">Name:</label>
+          <input type="text" value="<%= book.name %>" class="form-control" name="name">
+        </div>
+        <div class="mb-3">
+          <label for="price">Price:</label>
+          <input type="text" value="<%= book.price %>" class="form-control" name="price">
+        </div>
+        <div class="mb-3">
+          <label for="image">Author:</label>
+          <input type="text" value="<%= book.author %>" class="form-control" name="author">
+        </div>
+        <div class="mb-3">
+          <label for="image">Image Url:</label>
+          <input type="text" value="<%= book.imageUrl %>" class="form-control" name="image">
+        </div>
+        <div class="mb-3 text-center">
+          <input type="submit" class="btn btn-primary" value="Edit Book">
+        </div>
+      </form>
+    </div>
+    <% } %>
+</div>

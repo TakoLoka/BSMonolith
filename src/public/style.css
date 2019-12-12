@@ -1,0 +1,24 @@
+html, body{
+    padding: 0;
+    margin: 0;
+}
+
+.img-book{
+    padding: 16px;
+    height: 400px;
+}
+
+img{
+    width: 100%;
+}
+
+.book-name{
+    font-size: 18px;
+    height: 36px;
+}
+
+.book-delete{
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}

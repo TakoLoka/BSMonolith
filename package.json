@@ -1,0 +1,22 @@
+{
+  "name": "book-store",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index"
+  },
+  "author": "Tarik Demirtas",
+  "license": "ISC",
+  "private": true,
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "ejs": "^2.7.4",
+    "express": "^4.17.1",
+    "express-ejs-layouts": "^2.5.0",
+    "express-session": "^1.17.0",
+    "express-validator": "^6.3.0",
+    "sqlite3": "^4.1.1"
+  }
+}
