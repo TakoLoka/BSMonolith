@@ -22,3 +22,9 @@ img{
     right: 5px;
     top: 5px;
 }
+
+@media screen and (max-width: 767px){
+    .img-book{
+        height: 600px;
+    }
+}
