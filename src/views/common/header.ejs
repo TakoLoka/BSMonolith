@@ -1,50 +1,49 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <% if (typeof book !== 'undefined') { %>
-    <title>Book Store - <%= book.name %></title>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <% if (typeof band !=='undefined' ) { %>
+    <title>Band Store - <%= band.name %>
+    </title>
     <% } else { %>
-    <title>Book Store</title>
-    <% } %>
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css"
-      integrity="sha384-SI27wrMjH3ZZ89r4o+fGIJtnzkAnFs3E4qz9DIYioCQ5l9Rd/7UAa8DHcaL8jkWt"
-      crossorigin="anonymous"
-    />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/style.css" />
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top">
-      <a href="/" class="navbar-brand">Bookstore</a>
-      <% if (typeof user === 'object' && user) {%>
-        <% if(user.isAdmin) { %>
-          <form class="form-inline">
-            <a href="/books/add" class="btn btn-outline-light mr-2" role="button"
-            ><i class="fa fa-user-circle"></i> Add Book</a
-          >
-          </form>
-          <% } %>
-      <form class="form-inline ml-auto" method="POST" action="/logout">
-        <button class="btn btn-outline-light mr-2" role="button"
-          ><i class="fa fa-sign-out"></i> Logout</button
-        >
-      </form>
-      <% } else { %>
-      <form class="form-inline ml-auto">
-        <a href="/register" class="btn btn-outline-light mr-2"
-          ><i class="fa fa-user-circle"></i> Register</a
-        >
-        <a href="/login" class="btn btn-outline-light mr-2"
-          ><i class="fa fa-user"></i> Login</a
-        >
-      </form>
+      <title>Band Store</title>
       <% } %>
-    </nav>
-    <main role="main" class="container">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css"
+          integrity="sha384-SI27wrMjH3ZZ89r4o+fGIJtnzkAnFs3E4qz9DIYioCQ5l9Rd/7UAa8DHcaL8jkWt" crossorigin="anonymous" />
+        <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top">
+    <% if (typeof musician==='object' && musician) {%>
+      <a href="/" class="navbar-brand">Bandstore - <%= musician.name %></a>
+      <% if(musician.isAdmin) { %>
+        <form class="form-inline">
+          <a href="/bands/add" class="btn btn-outline-light mr-2" role="button"><i class="fa fa-music"></i>
+            Add Band</a>
+          <a href="/musicians/edit/<%= musician.name %>" class="btn btn-outline-light mr-2" role="button"><i
+              class="fa fa-user-circle"></i>
+            My Profile</a>
+          <a href="/musicians" class="btn btn-outline-light mr-2" role="button"><i
+              class="fa fa-user"></i>
+            Find Users</a>
+            <a href="/assessment/<%= musician.name %>" class="btn btn-outline-light mr-2" role="button"><i
+              class="fa fa-book"></i>
+            Take Assessment</a>
+        </form>
+        <% } %>
+          <form class="form-inline ml-auto" method="POST" action="/logout">
+            <button class="btn btn-outline-light mr-2" role="button"><i class="fa fa-sign-out"></i> Logout</button>
+          </form>
+          <% } else { %>
+            <form class="form-inline ml-auto">
+              <a href="/register" class="btn btn-outline-light mr-2"><i class="fa fa-user-circle"></i> Register</a>
+              <a href="/login" class="btn btn-outline-light mr-2"><i class="fa fa-user"></i> Login</a>
+            </form>
+            <% } %>
+  </nav>
+  <main role="main" class="container">

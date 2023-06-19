@@ -3,44 +3,80 @@ const db = new sqlite.Database('data/db.sqlite3');
 const enc = require('./encryption');
 
 db.serialize(() => {
-  db.run('CREATE TABLE IF NOT EXISTS books (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, price DOUBLE, author TEXT,imageUrl TEXT, createdAt TEXT)');
-  db.run('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, password TEXT, name TEXT, role INTEGER)');
-  db.get('SELECT COUNT(*) AS CNT FROM books', (err, row) => {
+  db.get('PRAGMA foreign_keys = ON');
+  db.run('CREATE TABLE IF NOT EXISTS genres (id INTEGER PRIMARY KEY, name TEXT)');
+  db.run('CREATE TABLE IF NOT EXISTS instruments (id INTEGER PRIMARY KEY, name TEXT)');
+  db.run('CREATE TABLE IF NOT EXISTS bands (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT, picture TEXT, lead_musician TEXT, genre_id INTEGER, FOREIGN KEY (genre_id) REFERENCES genres (id))');
+  db.run('CREATE TABLE IF NOT EXISTS musicians (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, password TEXT, description TEXT, picture TEXT, genre_id INTEGER, instrument_id INTEGER, skill DOUBLE, FOREIGN KEY (genre_id) REFERENCES genres (id), FOREIGN KEY (instrument_id) REFERENCES instruments (id))');
+  db.run('CREATE TABLE IF NOT EXISTS musicians_genres (id INTEGER PRIMARY KEY AUTOINCREMENT, musician_id INTEGER, genre_id INTEGER, FOREIGN KEY (musician_id) REFERENCES musicians (id), FOREIGN KEY (genre_id) REFERENCES genres (id))');
+  db.run('CREATE TABLE IF NOT EXISTS bands_genres (id INTEGER PRIMARY KEY AUTOINCREMENT, band_id INTEGER, genre_id INTEGER, FOREIGN KEY (band_id) REFERENCES bands (id), FOREIGN KEY (genre_id) REFERENCES genres (id))');
+  db.run('CREATE TABLE IF NOT EXISTS band_members (id INTEGER PRIMARY KEY AUTOINCREMENT, musician_id INTEGER, band_id INTEGER, FOREIGN KEY (musician_id) REFERENCES musicians (id), FOREIGN KEY (band_id) REFERENCES bands (id))');
+  db.run('CREATE TABLE IF NOT EXISTS band_history (id INTEGER PRIMARY KEY AUTOINCREMENT, musician_id INTEGER, band_id INTEGER, FOREIGN KEY (musician_id) REFERENCES musicians (id), FOREIGN KEY (band_id) REFERENCES bands (id))');
+  db.get('SELECT COUNT(*) AS CNT FROM genres', (err, row) => {
     if (row.CNT > 0) {
       return;
     }
 
-    const createdAt = new Date().toString();
-    const stmt = db.prepare('INSERT INTO books VALUES (null, ?, ?, ?, ?, ?)');
+    const stmt = db.prepare('INSERT INTO genres VALUES (?, ?)');
 
-    const books = [
-      ['The Name of the Wind', 8.21, 'Patrick Rothfuss', 'https://kbimages1-a.akamaihd.net/Images/0b52f9bd-f9cf-4f2b-bad0-52b9e8b20dfa/255/400/False/image.jpg',createdAt],
-      ['Animal Farm', 10.96, 'George Orwell', 'https://i.dr.com.tr/cache/600x600-0/originals/0000000447651-1.jpg',createdAt],
-      ['Metro 2033', 12.36, 'Dimitry Glukhovski', 'https://i.dr.com.tr/cache/600x600-0/originals/0000000667877-1.jpg',createdAt],
-      ["The Wise Man's Fear", 11.32, 'Patrick Rothfuss','https://i.dr.com.tr/cache/600x600-0/originals/0000000666684-1.jpg',createdAt],
-      ['Koralin', 6.96, 'Neil Gaiman','https://i.dr.com.tr/cache/600x600-0/originals/0001822965001-1.jpg',createdAt],
-      ['Norse Mythology', 10.46, 'Neil Gaiman','https://i.dr.com.tr/cache/600x600-0/originals/0001784514001-1.jpg',createdAt],
-      ['Revival', 15.96, 'Stephen King','https://i.dr.com.tr/cache/600x600-0/originals/0000000611189-1.jpg',createdAt],
-      ['The Talisman', 10.96, 'Stephen King','https://i.dr.com.tr/cache/600x600-0/originals/0000000416228-1.jpg',createdAt]
+    const genres = [
+      [1, 'Rock'],
+      [2, 'Metal'],
+      [3, 'Classical']
     ];
-    for (let book of books) {
-      stmt.run(book);
+    for (let genre of genres) {
+      stmt.run(genre);
     }
     stmt.finalize();
   });
-  db.get('SELECT COUNT(*) AS CNT FROM users', (err, row) => {
+  db.get('SELECT COUNT(*) AS CNT FROM instruments', (err, row) => {
     if (row.CNT > 0) {
       return;
     }
-    const stmt = db.prepare('INSERT INTO users VALUES (null, ?, ?, ?, ?)');
 
-    const users = [
-      ['tarik@gmail.com', enc.encryptPassword('takoloka'), 'Tarik', 1],
-      ['berk@gmail.com', enc.encryptPassword('berkaksoyy'), 'Berk', 1],
-      ['ertug@gmail.com',enc.encryptPassword('ertugsagman'), 'Ertug', 1]
+    const stmt = db.prepare('INSERT INTO instruments VALUES (?, ?)');
+
+    const instruments = [
+      [1, 'Guitar'],
+      [2, 'Drums'],
+      [3, 'Vocals']
     ];
-    for (let user of users) {
-      stmt.run(user);
+    for (let instrument of instruments) {
+      stmt.run(instrument);
+    }
+    stmt.finalize();
+  });
+  db.get('SELECT COUNT(*) AS CNT FROM bands', (err, row) => {
+    if (row.CNT > 0) {
+      return;
+    }
+
+    //const createdAt = new Date().toString();
+    const stmt = db.prepare('INSERT INTO bands VALUES (null, ?, ?, ?, ?, ?)');
+
+    const bands = [
+      ['The Name of the Wind', 'Patrick Rothfuss', 'https://kbimages1-a.akamaihd.net/Images/0b52f9bd-f9cf-4f2b-bad0-52b9e8b20dfa/255/400/False/image.jpg', "TakoLoka", 1],
+      ['Animal Farm', 'Dimitry Glukhovski', 'https://kbimages1-a.akamaihd.net/Images/0b52f9bd-f9cf-4f2b-bad0-52b9e8b20dfa/255/400/False/image.jpg', "TakoLoka", 2],
+      ['Metro 2033', 'Dimitry Glukhovski', 'https://kbimages1-a.akamaihd.net/Images/0b52f9bd-f9cf-4f2b-bad0-52b9e8b20dfa/255/400/False/image.jpg', "Berk", 1]
+    ];
+    for (let band of bands) {
+      stmt.run(band);
+    }
+    stmt.finalize();
+  });
+  db.get('SELECT COUNT(*) AS CNT FROM musicians', (err, row) => {
+    if (row.CNT > 0) {
+      return;
+    }
+    const stmt = db.prepare('INSERT INTO musicians VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?)');
+
+    const musicians = [
+      ['TakoLoka', 'tarik@gmail.com', enc.encryptPassword('takoloka'), 'Desc', "https://kbimages1-a.akamaihd.net/Images/0b52f9bd-f9cf-4f2b-bad0-52b9e8b20dfa/255/400/False/image.jpg", 1, 2, 0],
+      ['hgunes', 'hgunes@gmail.com', enc.encryptPassword('hgunes'), 'Desc 1', "https://kbimages1-a.akamaihd.net/Images/0b52f9bd-f9cf-4f2b-bad0-52b9e8b20dfa/255/400/False/image.jpg", 1, 1, 0],
+      ['tankut', 'tankut@gmail.com', enc.encryptPassword('tankut'), 'Desc 2', "https://kbimages1-a.akamaihd.net/Images/0b52f9bd-f9cf-4f2b-bad0-52b9e8b20dfa/255/400/False/image.jpg", 1, 2, 0],
+    ];
+    for (let musician of musicians) {
+      stmt.run(musician);
     }
     stmt.finalize();
   });

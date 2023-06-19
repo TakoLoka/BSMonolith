@@ -1,0 +1,76 @@
+<div class="row mt-5 align-items-center">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <img src="<%= musician.picture %>" />
+    </div>
+    <div class="col-md-4"></div>
+    <div class="col-md-4"></div>
+    <div class="col-md-4 align-center text-center">
+        <h3>
+            <%= musician.name %>
+        </h3>
+    </div>
+    <div class="col-md-4"></div>
+    <div class="col-md-2"></div>
+    <div class="col-md-8 mt-3 mb-3">
+        <h5 class="text-center">Description:</h5>
+        <p>
+            <%= musician.description %>
+        </p>
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-4"></div>
+    <div class="col-md-4 align-center text-center">
+
+        <h5>Instrument:</h5>
+        <p>
+            <%= musician.instrument.name %>
+        </p>
+        <h5>Genre:</h5>
+        <p>
+            <%= musician.genre.name %>
+        </p>
+        <h5>Email:</h5>
+        <p>
+            <%= musician.email %>
+        </p>
+    </div>
+    <div class="col-md-4"></div>
+
+    <% if (typeof user==='object' && user && user.isAdmin) { %>
+        <div class="col-md-12">
+            <h1 class="text-center">Edit musician</h1>
+        </div>
+        <div class="col-md-12">
+            <form method="post" action="/musician/<%= musician.id %>">
+                <div class="mb-3">
+                    <label for="name">Name:</label>
+                    <input type="text" value="<%= musician.name %>" class="form-control" name="name">
+                </div>
+                <div class="mb-3">
+                    <label for="price">Description:</label>
+                    <input type="text" value="<%= musician.description %>" class="form-control" name="description">
+                </div>
+                <div class="mb-3">
+                    <label for="genre">Genre:</label>
+                    <input type="text" value="<%= musician.genre.name %>" class="form-control" name="genre">
+                </div>
+                <div class="mb-3">
+                    <label for="instrument">Instrument:</label>
+                    <input type="text" value="<%= musician.instrument.name %>" class="form-control" name="instrument">
+                </div>
+                <div class="mb-3">
+                    <label for="image">Email:</label>
+                    <input type="text" value="<%= musician.email %>" class="form-control" name="email">
+                </div>
+                <div class="mb-3">
+                    <label for="image">Image Url:</label>
+                    <input type="text" value="<%= musician.image %>" class="form-control" name="image">
+                </div>
+                <div class="mb-3 text-center">
+                    <input type="submit" class="btn btn-primary" value="Edit musician">
+                </div>
+            </form>
+        </div>
+        <% } %>
+</div>

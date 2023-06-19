@@ -1,0 +1,35 @@
+<div class="row">
+  <div class="col-md-12">
+    <h1 class="text-center">Add Band</h1>
+  </div>
+  <div class="col-md-12">
+    <form method="post">
+      <div class="mb-3">
+        <label for="name">Name:</label>
+        <input type="text" class="form-control" name="name">
+      </div>
+      <div class="mb-3">
+        <label for="name">Description:</label>
+        <input type="text" class="form-control" name="description">
+      </div>
+      <div class="mb-3">
+        <label for="picture">Picture URL:</label>
+        <input type="text" class="form-control" name="picture">
+      </div>
+      <div class="mb-3">
+        <label for="genre">Genre:</label>
+        <select class="form-control" name="genre_id">
+          <option value="1">Please Select...</option>
+          <% for (let genre of genres) { %>
+            <option value="<%= genre.id %>">
+              <%= genre.name %>
+            </option>
+            <% } %>
+        </select>
+      </div>
+      <div class="mb-3 text-center">
+        <input type="submit" class="btn btn-primary" value="Add Band">
+      </div>
+    </form>
+  </div>
+</div>

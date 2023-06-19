@@ -1,0 +1,42 @@
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="text-center">Edit Profile</h1>
+    </div>
+    <div class="col-md-12">
+        <form method="post">
+            <div class="mb-3">
+                <label for="name">Description:</label>
+                <input type="text" class="form-control" name="description" value="<%= musician.description %>">
+            </div>
+            <div class="mb-3">
+                <label for="picture">Picture URL:</label>
+                <input type="text" class="form-control" name="picture" value="<%= musician.picture %>">
+            </div>
+            <div class="mb-3">
+                <label for="genre">Genre:</label>
+                <select class="form-control" name="genre_id">
+                    <% for (let genre of genres) { %>
+                        <option value="<%= genre.id %>" <%=musician.genre_id===genre.id ? "selected" : "" %>
+                            >
+                            <%= genre.name %>
+                        </option>
+                        <% } %>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="instrument_ids">Intruments:</label>
+                <select class="form-control" style="width: 100%;" name="instrument_ids">
+                    <% for (let instrument of instruments) { %>
+                        <option value="<%= instrument.id %>" <%=musician.instrument_id===instrument.id ? "selected" : "" %>
+                            >
+                            <%= instrument.name %>
+                        </option>
+                        <% } %>
+                </select>
+            </div>
+            <div class="mb-3 text-center">
+                <input type="submit" class="btn btn-primary" value="Edit Profile">
+            </div>
+        </form>
+    </div>
+</div>

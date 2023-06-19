@@ -1,0 +1,73 @@
+<h1 class="text-center">Bands</h1>
+<div class="container-fluid">
+  <div class="row filters mb-5">
+    <label>Filters:</label>
+    <input id="name-search" type="text" class="form-control" placeholder="Enter Name to Search..." name="name-search" />
+    <select id="genre-search" name="genre-search" class="form-control">
+      <% for (let genre of genres) { %>
+        <option value="<%= genre.id %>">
+          <%= genre.name %>
+        </option>
+        <% } %>
+    </select>
+    <div class="col-md-12 text-center">
+      <button id="band-filter-button" class="btn btn-dark text-light">Filter</button>
+    </div>
+    <script>
+      var link = document.getElementById("band-filter-button");
+      link.addEventListener("click", function (e) {
+        var name = document.getElementById("name-search").value;
+        var genre = document.getElementById("genre-search").value;
+        var url = window.location.origin;
+        window.location.href = url +
+          "?name=" + name + "&genre=" + genre;
+      });
+    </script>
+  </div>
+  <div class="row text-center">
+    <% for (let band of bands) { %>
+      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 border border-dark mb-3">
+        <div class="card">
+          <% if (typeof musician==='object' && musician && musician.isAdmin) {%>
+            <div class="band-delete">
+              <form method="POST" action="/band/delete/<%= band.id %>">
+                <button class="btn btn-dark" type="submit">
+                  <i class="fa fa-remove"></i>
+                </button>
+              </form>
+            </div>
+            <% } %>
+              <% if (band.picture) { %>
+                <img src="<%= band.picture %>" class="card-img-top img-band" alt="band Image" />
+                <% } else { %>
+                  <img src="/images/book-cover-placeholder.jpg" class="card-img-top img-band" alt="band Placeholder" />
+                  <% } %>
+                    <div class="card-body">
+                      <h5 class="card-title band-name">
+                        <%= band.name %>
+                      </h5>
+                      <p class="card-text">
+                      <div>Genre: <%= band.genre %>
+                      </div>
+                      <div>Lead: <%= band.lead_musician %>
+                      </div>
+                      </p>
+                      <a href="/band/<%= band.id %>" role="button"
+                        class="btn btn-dark <%= (typeof musician === 'object' && musician) ? '':" disabled"%>"
+                        <%= (typeof musician==='object' && musician) ? '' :"aria-disabled='true'"%>>Inspect</a>
+        </div>
+      </div>
+    </div>
+    <% } %>
+  </div>
+  <div class=" col-xs-12">
+                          <ul class="pagination justify-content-center">
+                            <% for (i=0; i < maxPage ; i++) { %>
+                              <li class="page-item <%= (i == maxPage - 1) ? 'active':'' %>"><a class="page-link"
+                                  href="?page=<%= (i + 1) %>">
+                                  <%= (i + 1) %>
+                                </a></li>
+                              <% } %>
+                          </ul>
+                    </div>
+        </div>

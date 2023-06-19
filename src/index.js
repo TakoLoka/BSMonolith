@@ -6,10 +6,10 @@ const { check, validationResult } = require("express-validator");
 const session = require("express-session");
 
 const app = express();
-const pageSize = 12;
+const pageSize = 8;
 
 function isAdmin(req, res, next) {
-  if (req.session.user && req.session.user.isAdmin) {
+  if (req.session.musician && req.session.musician.isAdmin) {
     return next();
   } else {
     return res.redirect('/login');
@@ -26,8 +26,8 @@ app.use(
     saveUninitialized: false
   })
 );
-app.use(function(req, res, next) {
-  res.locals.user = req.session.user;
+app.use(function (req, res, next) {
+  res.locals.musician = req.session.musician;
   next();
 });
 
@@ -35,34 +35,122 @@ app.set("views", "src/views");
 app.set("view engine", "ejs");
 
 app.get("/", (req, res, next) => {
-  db.get("SELECT COUNT(*) as COUNT FROM books", (err, row) => {
+  db.get("SELECT COUNT(*) as COUNT FROM bands", (err, row) => {
     if (err) {
       return next(err);
     }
-    const maxPage = Math.ceil(row.COUNT/pageSize);
+    const maxPage = Math.ceil(row.COUNT / pageSize);
 
-    if(!req.query.page)
+    if (!req.query.page)
       req.query.page = 1;
 
-    db.all(`SELECT * FROM books LIMIT ${pageSize} OFFSET ${pageSize * (req.query.page - 1)}`, (err, books) => {
-      if(err){
+    let queryString = "";
+
+    if (req.query.name || req.query.genre) {
+      queryString += " WHERE name LIKE '%" + req.query.name + "%' AND genre_id = " + req.query.genre;
+    }
+
+    db.all(`SELECT * FROM bands${queryString} LIMIT ${pageSize} OFFSET ${pageSize * (req.query.page - 1)}`, (err, bands) => {
+      if (err) {
         return next(err);
       }
-      res.render("books/index", { books, maxPage });
+      db.all("SELECT * FROM genres", (err, genres) => {
+        bands.map(band => {
+          band.genre = genres.find(genre => genre.id === band.genre_id).name;
+        });
+        res.render("bands/index", { bands, genres, maxPage });
+      })
     });
   });
 });
 
-app.get("/books/add", isAdmin, (req, res) => {
-  res.render("books/add-book");
+app.get("/musicians", (req, res, next) => {
+  db.get("SELECT COUNT(*) as COUNT FROM musicians", (err, row) => {
+    if (err) {
+      return next(err);
+    }
+    const maxPage = Math.ceil(row.COUNT / pageSize);
+
+    if (!req.query.page)
+      req.query.page = 1;
+
+    let queryString = "";
+
+    if (req.query.name || req.query.genre) {
+      queryString += " WHERE name LIKE '%" + req.query.name + "%' AND genre_id = " + req.query.genre + " AND instrument_id = " + req.query.instrument;
+    }
+
+    db.all(`SELECT * FROM musicians${queryString} LIMIT ${pageSize} OFFSET ${pageSize * (req.query.page - 1)}`, (err, musicians) => {
+      if (err) {
+        return next(err);
+      }
+      db.all("SELECT * FROM genres", (err, genres) => {
+        musicians.map(musician => {
+          musician.genre = genres.find(genre => genre.id === musician.genre_id).name;
+        });
+        db.all("SELECT * FROM instruments", (err, instruments) => {
+          musicians.map(musician => {
+            musician.instrument = instruments.find(instrument => instrument.id === musician.instrument_id).name;
+          });
+          res.render("musicians/index", { musicians, genres, instruments, maxPage });
+        })
+      })
+    });
+  });
 });
 
-app.post("/books/add", isAdmin, (req, res) => {
-  const book = req.body;
-  book.createdAt = new Date().toString();
-  const stmt = db.prepare("INSERT INTO books VALUES (null, ?, ?, ?, ?, ?)");
+app.get("/musician/:id", isAdmin, (req, res) => {
+  db.all("SELECT * FROM musicians WHERE id = '" + req.params.id + "'", (err, musicians) => {
+    const musician = musicians[0];
+    db.all("SELECT * FROM genres", (err, genres) => {
+      musician.genre = genres.find(genre => genre.id === musician.genre_id);
+      db.all("SELECT * FROM instruments", (err, instruments) => {
+        musician.instrument = instruments.find(instrument => instrument.id === musician.instrument_id);
+        res.render("musicians/profile", { musician, genres, instruments });
+      });
+    });
+  });
+});
+
+app.get("/musicians/edit/:name", isAdmin, (req, res) => {
+  db.all("SELECT * FROM musicians WHERE name = '" + req.params.name + "'", (err, musicians) => {
+    const musician = musicians[0];
+    db.all("SELECT * FROM genres", (err, genres) => {
+      db.all("SELECT * FROM instruments", (err, instruments) => {
+        res.render("musicians/edit", { musician, genres, instruments });
+      });
+    });
+  });
+});
+
+app.post("/musicians/edit/:name", isAdmin, (req, res) => {
+  const musicianData = req.params;
+  console.log(musicianData.name);
+  const stmt = db.prepare("UPDATE musicians SET description = ?, picture = ?, genre_id = ?, instrument_id = ?, skill = 0 WHERE name = '" + musicianData.name + "'");
+  const musician = [
+    req.body.description,
+    req.body.picture,
+    req.body.genre_id,
+    req.body.instrument_ids
+  ];
+  stmt.run(musician);
+  stmt.finalize();
+
+  res.redirect("/");
+});
+
+app.get("/bands/add", isAdmin, (req, res) => {
+  db.all("SELECT * FROM genres", (err, genres) => {
+    res.render("bands/add-band", { genres });
+  });
+});
+
+app.post("/bands/add", isAdmin, (req, res) => {
+  const stmt = db.prepare(`INSERT INTO bands VALUES (null, ?, ?, ?, ?, ?)`);
+  console.log(req.session.musician.name);
+  const band = [req.body.name, req.body.description, req.body.image, req.session.musician.name, req.body.genre_id];
   stmt.run(
-    [book.name, book.price, book.author, book.image, book.createdAt],
+    band,
     () => {
       res.redirect("/");
     }
@@ -70,36 +158,52 @@ app.post("/books/add", isAdmin, (req, res) => {
   stmt.finalize();
 });
 
-app.get("/book/:id", (req, res, next) => {
-  db.get("SELECT * FROM books WHERE id=" + req.params.id, (err, book) => {
+app.get("/band/:id", (req, res, next) => {
+  db.get("SELECT * FROM bands WHERE id=" + req.params.id, (err, band) => {
     if (err) {
       return next(err);
     }
-    if (!book) {
+    if (!band) {
       return res.render("error/404");
     }
-    res.render("books/book", { book });
+    db.all("SELECT * FROM genres", (err, genres) => {
+      band.genre = genres.find(genre => genre.id === band.genre_id).name;
+      const band_members = [];
+      db.all("SELECT * FROM band_members WHERE band_id = " + req.params.id, (err, bands_members) => {
+        if (bands_members) {
+          let id_list = "";
+          bands_members.map(member => id_list += member.musician_id + ",");
+          id_list = id_list.slice(0, id_list.length - 1);
+          console.log(id_list);
+          db.all("SELECT * FROM musicians where id IN (" + id_list + ")", (err, musician) => {
+            band_members.push(musician[0]);
+            console.log(band_members);
+            res.render("bands/band", { band, band_members });
+          });
+        }
+      });
+    })
   });
 });
 
-app.post("/book/:id", isAdmin, (req, res, next) => {
+app.post("/band/edit/:id", isAdmin, (req, res, next) => {
   const newBook = req.params;
-  const stmt = db.prepare("UPDATE books SET name = ?, price = ?, author = ?, imageUrl = ? WHERE id = " + newBook.id);
-    const book = [
-      req.body.name,
-      req.body.price,
-      req.body.author,
-      req.body.image
-    ];
-    stmt.run(book);
-    stmt.finalize();
-    res.redirect('/');
+  const stmt = db.prepare("UPDATE bands SET name = ?, price = ?, author = ?, imageUrl = ? WHERE id = " + newBook.id);
+  const band = [
+    req.body.name,
+    req.body.price,
+    req.body.author,
+    req.body.image
+  ];
+  stmt.run(band);
+  stmt.finalize();
+  res.redirect('/');
 });
 
-app.post("/book/delete/:id", isAdmin, (req, res) => {
-  if(req.params.id){
-    db.all(`DELETE FROM books WHERE id=${req.params.id}`, (err) => {
-      if(err){
+app.post("/band/delete/:id", isAdmin, (req, res) => {
+  if (req.params.id) {
+    db.all(`DELETE FROM bands WHERE id=${req.params.id}`, (err) => {
+      if (err) {
         return console.log(err);
       }
       res.redirect("/");
@@ -108,7 +212,7 @@ app.post("/book/delete/:id", isAdmin, (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  res.render("users/login");
+  res.render("musicians/login");
 });
 
 app.post(
@@ -121,28 +225,28 @@ app.post(
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       console.log(errors.mapped());
-      return res.render("users/login", { errors: errors.mapped() });
+      return res.render("musicians/login", { errors: errors.mapped() });
     }
     db.get(
-      "SELECT * FROM users WHERE email='" + req.body.email + "'",
-      (err, user) => {
+      "SELECT * FROM musicians WHERE email='" + req.body.email + "'",
+      (err, musician) => {
         if (err) {
           return next(err);
         }
-        if (!user) {
-          return res.render("users/login", { errEmail: "Email is wrong!" });
+        if (!musician) {
+          return res.render("musicians/login", { errEmail: "Email is wrong!" });
         }
 
-        if (user.password === enc.encryptPassword(req.body.password)) {
-          req.session.user = {
-            name: user.name,
-            email: user.email,
-            isAdmin: user.role == 0 ? false : true
+        if (musician.password === enc.encryptPassword(req.body.password)) {
+          req.session.musician = {
+            name: musician.name,
+            email: musician.email,
+            isAdmin: musician.role == 0 ? false : true
           };
 
           res.redirect("/");
         } else {
-          return res.render("users/login", {
+          return res.render("musicians/login", {
             errPassword: "Password is wrong!"
           });
         }
@@ -152,12 +256,12 @@ app.post(
 );
 
 app.get("/register", (req, res) => {
-  res.render("users/register");
+  res.render("musicians/register");
 });
 
 app.post("/logout", (req, res) => {
-  if (req.session && req.session.user) {
-    delete req.session.user;
+  if (req.session && req.session.musician) {
+    delete req.session.musician;
   }
   res.redirect("/");
 });
@@ -183,20 +287,24 @@ app.post(
 
     if (!errors.isEmpty()) {
       const err = errors.mapped();
-      return res.render("users/register", { errors: err, confirm });
+      return res.render("musicians/register", { errors: err, confirm });
     }
 
-    const stmt = db.prepare("INSERT INTO users VALUES (null, ?, ?, ?, ?)");
-    const user = [
+    const stmt = db.prepare("INSERT INTO musicians VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?)");
+    const musician = [
+      req.body.name,
       req.body.email,
       enc.encryptPassword(req.body.password),
-      req.body.name,
+      "Hello I am a new Musician",
+      "",
+      1,
+      1,
       0
     ];
-    stmt.run(user);
+    stmt.run(musician);
     stmt.finalize();
 
-    req.session.user = {
+    req.session.musician = {
       name: req.body.name,
       email: req.body.email,
       isAdmin: false
@@ -205,6 +313,11 @@ app.post(
     res.redirect("/");
   }
 );
+
+app.get("/assessment/:name", (req, res) => {
+  res.render("musicians/assessment");
+});
+
 
 app.use((err, req, res, next) => {
   console.log(err);

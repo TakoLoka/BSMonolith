@@ -1,0 +1,44 @@
+<div class="container">
+    <div id="quiz" class="p-2">
+        <h1>Skill Assessment</h1>
+        <ol id="questions-list" class="list-group list-group-numbered">
+            <li class="list-group-item" id="Q1">
+                what does this JS code return? <br>
+                (0 || '' || false || "Hi")
+                <ol type="a" id="q1-ol">
+                    <li><input class="form-check-input me-1" type="radio" name="q1-input" value="0"> 0</li>
+                    <li><input class="form-check-input me-1" type="radio" name="q1-input" value="Hi"> "Hi"</li>
+                    <li><input class="form-check-input me-1" type="radio" name="q1-input" value="false"> false</li>
+                    <li><input class="form-check-input me-1" type="radio" name="q1-input" value="''"> ''</li>
+                </ol>
+            </li>
+            <li class="list-group-item" id="Q2">
+                What is it called when a function calls itself?
+                <ol type="a">
+                    <li><input class="form-check-input me-1" type="radio" name="q2-input" value="Inception"> Inception
+                    </li>
+                    <li><input class="form-check-input me-1" type="radio" name="q2-input" value="Self-Referential">
+                        Self-Referential</li>
+                    <li><input class="form-check-input me-1" type="radio" name="q2-input" value="Recursion"> Recursion
+                    </li>
+                    <li><input class="form-check-input me-1" type="radio" name="q2-input" value="Who Cares"> Who Cares
+                    </li>
+                </ol>
+            </li>
+            <li class="list-group-item" id="Q3">
+                How do you access the value of the data-count data attribute in Javascript?
+                <ol type="a">
+                    <li><input class="form-check-input me-1" type="radio" name="q3-input" value="element.dataset.count">
+                        element.dataset.count</li>
+                    <li><input class="form-check-input me-1" type="radio" name="q3-input"
+                            value="element.datAttribute.count"> element.datAttribute.count</li>
+                    <li><input class="form-check-input me-1" type="radio" name="q3-input"
+                            value="element.dataset.dataCount"> element.dataset.dataCount</li>
+                    <li><input class="form-check-input me-1" type="radio" name="q3-input" value="element.dataCount">
+                        element.dataCount</li>
+                </ol>
+            </li>
+        </ol>
+        <button class="btn btn-outline-primary mt-3">Complete Assessment</button>
+    </div>
+</div>

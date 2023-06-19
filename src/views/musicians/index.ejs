@@ -1,0 +1,87 @@
+<h1 class="text-center">Musicians</h1>
+<div class="container-fluid">
+    <div class="row filters mb-5">
+        <label>Filters:</label>
+        <input id="name-search" type="text" class="form-control" placeholder="Enter Name to Search..."
+            name="name-search" />
+        <select id="genre-search" name="genre-search" class="form-control">
+            <% for (let genre of genres) { %>
+                <option value="<%= genre.id %>">
+                    <%= genre.name %>
+                </option>
+                <% } %>
+        </select>
+        <select id="instrument-search" name="instrument-search" class="form-control">
+            <% for (let instrument of instruments) { %>
+                <option value="<%= instrument.id %>">
+                    <%= instrument.name %>
+                </option>
+                <% } %>
+        </select>
+        <div class="col-md-12 text-center">
+            <button id="musician-filter-button" class="btn btn-dark text-light">Filter</button>
+        </div>
+        <script>
+            var link = document.getElementById("musician-filter-button");
+            link.addEventListener("click", function (e) {
+                var name = document.getElementById("name-search").value;
+                var genre = document.getElementById("genre-search").value;
+                var instrument = document.getElementById("instrument-search").value;
+                var url = window.location.origin + window.location.pathname;
+                window.location.href = url +
+                    "?name=" + name + "&genre=" + genre + "&instrument=" + instrument;
+            });
+        </script>
+    </div>
+    <div class="row text-center">
+        <% for (let musician of musicians) { %>
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 border border-dark mb-3">
+                <div class="card">
+                    <% if (typeof musician==='object' && musician && musician.isAdmin) {%>
+                        <div class="musician-delete">
+                            <form method="POST" action="/musician/delete/<%= musician.id %>">
+                                <button class="btn btn-dark" type="submit">
+                                    <i class="fa fa-remove"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <% } %>
+                            <% if (musician.picture) { %>
+                                <img src="<%= musician.picture %>" class="card-img-top img-musician"
+                                    alt="musician Image" />
+                                <% } else { %>
+                                    <img src="/images/book-cover-placeholder.jpg" class="card-img-top img-musician"
+                                        alt="musician Placeholder" />
+                                    <% } %>
+                                        <div class="card-body">
+                                            <h5 class="card-title musician-name">
+                                                <%= musician.name %>
+                                            </h5>
+                                            <div>
+                                                Instrument: <%= musician.instrument %>
+                                            </div>
+                                            <p class="card-text">
+                                            <div>
+                                                Genre: <%= musician.genre %>
+                                            </div>
+                                            </p>
+                                            <a href="/musician/<%= musician.id %>" role="button"
+                                                class="btn btn-dark <%= (typeof musician === 'object' && musician) ? '':'disabled'%>"
+                                                <%=(typeof musician==='object' && musician) ? '' :"aria-disabled='true'"%>>Inspect</a>
+        </div>
+      </div>
+    </div>
+    <% } %>
+  </div>
+  <div class=" col-xs-12">
+                                                <ul class="pagination justify-content-center">
+                                                    <% for (i=0; i < maxPage ; i++) { %>
+                                                        <li class="page-item <%= (i == maxPage - 1) ? 'active':'' %>">
+                                                            <a class="page-link" href="?page=<%= (i + 1) %>">
+                                                                <%= (i + 1) %>
+                                                            </a>
+                                                        </li>
+                                                        <% } %>
+                                                </ul>
+                                        </div>
+                </div>
