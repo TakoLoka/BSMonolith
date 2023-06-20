@@ -26,18 +26,29 @@
             <%= band.genre %>
           </p>
   </div>
-  <div class="col-md-4"></div>
   <div class="col-md-4 align-center text-center">
     <h5>Band Members:</h3>
-      <% if(band_members && band_members.length> 0) { %>
-        <% for(let musician of band_members) {%>
-          <p>
-            <%= musician && musician.name %>
-          </p>
-          <% }} %>
+      <div>
+        <%= band.lead_musician %>
+      </div>
+      <% if(band_members && band_members.length) { %>
+        <% const approved_members=band_members.filter(member=> member && member.approved === 1) %>
+          <% for(let musician of approved_members) {%>
+            <div>
+              <%= musician && musician.name %>
+                <form style="display: inline;" method="POST" action="reject-member/<%= band.id %>/<%= musician.id %>">
+                  <button style="display: inline;" type="submit" class="btn btn-danger btn-sm"><i
+                      class="fa fa-trash"></i></button></form>
+                  </div>
+            <% }} %>
+  </div>
+  <div class="col-md-4">
+    <form method="POST" action="apply-band/<%= band.id %>">
+      <button class="btn btn-dark" type="submit">Apply</button>
+    </form>
   </div>
 
-  <% if (typeof user==='object' && user && user.isAdmin) { %>
+  <% if (typeof musician==='object' && musician && musician.name===band.lead_musician) { %>
     <div class="col-md-12">
       <h1 class="text-center">Edit Band</h1>
     </div>
@@ -63,6 +74,21 @@
           <input type="submit" class="btn btn-primary" value="Edit band">
         </div>
       </form>
+      <% if(band_members && band_members.length) { %>
+        <% const approved_members=band_members.filter(member=> member && member.approved === 0) %>
+          <% for(let musician of band_members) {%>
+            <div class="mb-3 text-center">
+              <h5>Candidates</h5>
+              <p>
+                <%= musician && musician.name %>
+              </p>
+              <form method="POST" action="approve-member/<%= band.id %>/<%= musician.id %>"><button type="submit"
+                  class="btn btn-success">Approve</button></form>
+              <form method="POST" action="reject-member/<%= band.id %>/<%= musician.id %>"><button type="submit"
+                  class="btn btn-danger">Reject</button></form>
+            </div>
+            <hr>
+            <% }} %>
     </div>
     <% } %>
 </div>

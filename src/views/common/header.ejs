@@ -21,7 +21,6 @@
   <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top">
     <% if (typeof musician==='object' && musician) {%>
       <a href="/" class="navbar-brand">Bandstore - <%= musician.name %></a>
-      <% if(musician.isAdmin) { %>
         <form class="form-inline">
           <a href="/bands/add" class="btn btn-outline-light mr-2" role="button"><i class="fa fa-music"></i>
             Add Band</a>
@@ -35,7 +34,6 @@
               class="fa fa-book"></i>
             Take Assessment</a>
         </form>
-        <% } %>
           <form class="form-inline ml-auto" method="POST" action="/logout">
             <button class="btn btn-outline-light mr-2" role="button"><i class="fa fa-sign-out"></i> Logout</button>
           </form>

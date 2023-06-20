@@ -28,7 +28,7 @@
     <% for (let band of bands) { %>
       <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 border border-dark mb-3">
         <div class="card">
-          <% if (typeof musician==='object' && musician && musician.isAdmin) {%>
+          <% if (false) {%>
             <div class="band-delete">
               <form method="POST" action="/band/delete/<%= band.id %>">
                 <button class="btn btn-dark" type="submit">
@@ -38,7 +38,7 @@
             </div>
             <% } %>
               <% if (band.picture) { %>
-                <img src="<%= band.picture %>" class="card-img-top img-band" alt="band Image" />
+                <img src="<%= band.picture %>" class="card-img-top img-band mt-2" alt="band Image" />
                 <% } else { %>
                   <img src="/images/book-cover-placeholder.jpg" class="card-img-top img-band" alt="band Placeholder" />
                   <% } %>
